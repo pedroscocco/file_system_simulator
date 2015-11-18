@@ -1,7 +1,7 @@
 # encoding: utf-8
 require 'readline'
 
-require_relative 'file_system_manager'
+require_relative 'file_system'
 
 class Simulator
   
@@ -20,9 +20,11 @@ class Simulator
     verbose: 0
   }
 
+  attr_accessor :exit_flag, :file_system
+
   def initialize
     @exit_flag = false
-    @file_system_manager = FileSystem.new
+    @file_system = nil
   end
 
   def main
@@ -52,8 +54,9 @@ class Simulator
   end
   
   def mount args
-    result = @file_system_manager.mount(args)
-    puts result
+    path = args[0]
+    self.file_system = FileSystem.get_instance(path)
+    @file_system.mount
   end
   
   def cp args
