@@ -1,6 +1,8 @@
 # encoding: utf-8
 require 'readline'
 
+require_relative 'file_system_manager'
+
 class Simulator
   
   COMMANDS = {
@@ -20,6 +22,7 @@ class Simulator
 
   def initialize
     @exit_flag = false
+    @file_system_manager = FileSystem.new
   end
 
   def main
@@ -49,7 +52,8 @@ class Simulator
   end
   
   def mount args
-    puts __method__
+    result = @file_system_manager.mount(args)
+    puts result
   end
   
   def cp args
