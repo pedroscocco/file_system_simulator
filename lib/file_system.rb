@@ -1,10 +1,9 @@
 # encoding: utf-8
-require 'pry'
 
 require_relative 'fs'
-require_relative 'file'
 require_relative 'bit_map'
 require_relative 'fat'
+require_relative 'file'
 
 class FileSystem
 
@@ -35,8 +34,8 @@ class FileSystem
     if !File.exist?(self.path)
       create_new_partition()
     end
-    @fat = Fat.new()
-    binding.pry
+    @fat = Fat.new() if @fat.nil?
+    root = Directory.get_root()
   end
 
   def ls path
@@ -55,17 +54,15 @@ class FileSystem
   end
 
   def create_new_partition
-    IO.write(self.path, ([0]*FS::PARTITION_SIZE).pack(FS::INT_8))
+    IO.write(self.path, ([0]*FS::PARTITION_SIZE).pack(FS::INT_8 + '*'))
 
     data_blocks_size = (FS::PARTITION_SIZE - FS::FREE_SPACE_SIZE - FS::FAT_SIZE) / FS::BLOCK_SIZE
 
-    IO.write(self.path, [FS::FAT_MAGIC_NUMBER, data_blocks_size].pack(FS::INT_16), FS::SUPER_BLOCK_OFFSET)
+    IO.write(self.path, [FS::FAT_MAGIC_NUMBER, data_blocks_size].pack(FS::INT_16 * 2), FS::SUPER_BLOCK_OFFSET)
 
-    BitMap.set(0)
-
-    IO.write(self.path, [-1].pack(FS::INT_16), FS::FAT_OFFSET )
+    @fat = Fat.new()
     
-    root = Directory.get_root_metadata
+    Directory.create_root
   end
 
   def umount

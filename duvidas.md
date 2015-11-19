@@ -35,3 +35,5 @@ Data(A) = 4 bytes
 Data(C) = 4 bytes 
 Data(M) = 4 bytes 
 
+TODO:: Preencher restante dos bytes inutilizados do BitMap com 1
+

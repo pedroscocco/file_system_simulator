@@ -2,7 +2,7 @@
 
 class Fat < Array
   def initialize
-    super(IO.read(FileSystem.path, FS::FAT_SIZE, FS::FAT_OFFSET).unpack(FS::INT_16))
+    super(IO.read(FileSystem.path, FS::FAT_SIZE, FS::FAT_OFFSET).unpack(FS::INT_16 + '*'))
   end
 
   def []= index, val

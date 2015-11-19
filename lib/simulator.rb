@@ -1,5 +1,6 @@
 # encoding: utf-8
 require 'readline'
+require 'pry'
 
 require_relative 'file_system'
 
@@ -56,7 +57,7 @@ class Simulator
   def mount args
     path = args[0]
     self.file_system = FileSystem.get_instance(path)
-    @file_system.mount
+    self.file_system.mount
   end
   
   def cp args
@@ -64,6 +65,9 @@ class Simulator
   end
   
   def mkdir args
+    binding.pry
+    path = args[0]
+    self.file_system.mkdir()
     puts __method__
   end
   

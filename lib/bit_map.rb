@@ -1,26 +1,54 @@
 # encoding: utf-8
-require 'pry'
 
 class BitMap
-  def self.set(index)
-    offset = FS::FREE_SPACE_OFFSET + index/8
+  def self.allocate n
+    i = 0
+    allocated = []
+    bytes = IO.read(FileSystem.path, (FS::DATA_BLOCKS / 8.0).ceil, FS::FREE_SPACE_OFFSET).unpack(FS::U_INT_8 + '*')
+    while ( i < bytes.size && allocated.size < n)
+      while (allocated.size < n && bytes[i] < 255)
+        byte_string = bytes[i].to_s(2).reverse
+        byte_string = ('%-8.8s' % byte_string).gsub(' ', "0")
+        index = byte_string.index '0'
+        allocated << (i * 8) + index if(((i * 8) + index) < FS::DATA_BLOCKS)
+        byte_string[index] = '1'
+        bytes[i] = byte_string.reverse.to_i(2)
+      end
+      i += 1
+    end
 
-    byte = IO.read(FileSystem.path, 1, offset).unpack(FS::INT_8).first
+    if !allocated.empty?
+      IO.write(FileSystem.path, bytes.pack(FS::U_INT_8 + '*'), FS::FREE_SPACE_OFFSET)
+    end
 
-    mask = 1 << index%8
-    byte = byte | mask
-
-    IO.write(FileSystem.path, [byte].pack(FS::INT_8), offset)
+    return allocated
   end
 
-  def self.free(index)
+  def self.get(index)
     offset = FS::FREE_SPACE_OFFSET + index/8
 
-    byte = IO.read(FileSystem.path, 1, offset).unpack(FS::INT_8).first
+    byte = IO.read(FileSystem.path, 1, offset).unpack(FS::U_INT_8).first
 
     mask = 1 << index%8
-    byte = byte & ~mask
+    (byte & mask) == 0 ? 0 : 1
+  end
+
+  def self.set_used(index)
+    set(index, 1)
+  end
+
+  def self.set_free(index)
+    set(index, 0)
+  end
+
+  def self.set(index, used)
+    offset = FS::FREE_SPACE_OFFSET + index/8
+
+    byte = IO.read(FileSystem.path, 1, offset).unpack(FS::U_INT_8).first
+
+    mask = 1 << index%8
+    byte = (used == 0) ? (byte & ~mask) : (byte | mask)
     
-    IO.write(FileSystem.path, [byte].pack(FS::INT_8), offset)
-  end  
+    IO.write(FileSystem.path, [byte].pack(FS::U_INT_8), offset)
+  end
 end
