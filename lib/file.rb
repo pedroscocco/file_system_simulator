@@ -21,6 +21,10 @@ class FSFile
     @parent = parent
     @entry_pointer = entry_pointer
   end
+  
+  def is_dir?
+    self.file_type == 0
+  end
 
   # def self.new_file name, content="waka foo bar"
   #   time = Time.now.to_i
@@ -45,6 +49,13 @@ class FSFile
   # def new_file name, size
 
   # end
+  
+  def self.init_file entry, parent, entry_pointer
+    name = entry.slice!(0, NAME_SIZE).strip
+    pointer, size, type, a_date, c_date, m_date, entries_qnt = entry.unpack(ENTRY_FORMAT_STRING)
+
+    File.new(pointer, name, size, type, a_date, c_date, m_date, entries_qnt, parent, entry_pointer)
+  end
 
   def to_entry
     name = ('%-128.128s' % self.name).gsub(' ', "\x00")
@@ -106,6 +117,7 @@ end
 
 class Directory < FSFile
 
+# Todos os valores em bytes
   NAME_SIZE = 128
   POINTER_SIZE = 2
   SIZE_SIZE = 4
@@ -173,9 +185,23 @@ class Directory < FSFile
 
     return @@root
   end
-
-  def self.get_dir path
-    Directory.get_root
+  
+  def get_path path
+    #recursivo (pra depois)
+  end
+  
+  def get_entry name
+    (0...self.entries_qnt).each do |i|
+      entry = self.read( ENTRY_SIZE, i * ENTRY_SIZE)
+       if entry[0, NAME_SIZE].strip == name
+         if entry[TYPE_OFFSET, 1].unpack(FS::INT_8).first == 0
+           return Directory.init_dir(entry, self, i * ENTRY_SIZE)
+         else
+           return FSFile.init_file(entry, self, i * ENTRY_SIZE)
+         end
+       end
+    end
+    return nil
   end
 
   def list_entries

@@ -38,8 +38,9 @@ class FileSystem
     root = Directory.get_root()
   end
 
-  def ls path="/"
-    file_list = Directory.get_dir("/").list_entries
+  def ls path
+    path = '/' if path.nil?
+    file_list = self.get_path(path).list_entries
     if !file_list.empty?
       printf("%s %s %s\n", "[File Type][File Name]", "[Size]", "[Last Changes]")
       file_list.each do |f|
@@ -51,11 +52,14 @@ class FileSystem
     end
   end
 
-  def get_dir path
-    path_list = path.split(',')[1..-1]
+  def get_path path
+    path_list = path.split('/')
+    path_list.shift if path_list[0] == ""
+    file = Directory.get_root
     path_list.each do |f|
-
+      file = file.get_entry f if file.is_dir?
     end
+    return file
   end
 
   def mkdir path

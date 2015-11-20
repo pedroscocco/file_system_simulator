@@ -13,12 +13,13 @@ class Simulator
     rmdir:   1,
     cat:     1,
     touch:   1,
-    ls:      1,
+    ls:      0,
     rm:      1,
     find:    2,
     df:      0,
     umount:  0,
     sai:     0,
+    debug:   0,
     verbose: 0
   }
 
@@ -66,7 +67,6 @@ class Simulator
   end
   
   def mkdir args
-    binding.pry
     puts __method__
   end
   
@@ -106,6 +106,10 @@ class Simulator
   def sai args
     puts 'Good bye!'
     @exit_flag = true
+  end
+  
+  def debug args
+    binding.pry
   end
   
   def verbose args
