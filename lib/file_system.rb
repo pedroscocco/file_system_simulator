@@ -38,8 +38,18 @@ class FileSystem
     root = Directory.get_root()
   end
 
-  def ls path
-
+  def ls path="/"
+    file_list = Directory.get_dir("/").list_entries
+    if !file_list.empty?
+      printf("%s %s %s\n", "[File Type][File Name]", "[Size]", "[Last Changes]")
+      file_list.each do |f|
+        # binding.pry
+        file_type = (f.file_type == FSFile::MAGIC_NUMBER[:directory]) ? "Dir" : "File"
+        printf("%s %s %s %s\n","[" + file_type + "]" , "[" + f.name + "]" , "[" + (f.entries_qnt*Directory::ENTRY_SIZE).to_s + "]", "[" + Time.at(f.m_date).strftime("%d/%m/%Y -- %T") + "]")
+      end
+      printf("Empty\n")
+    else
+    end
   end
 
   def get_dir path

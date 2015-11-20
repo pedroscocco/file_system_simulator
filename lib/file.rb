@@ -22,6 +22,17 @@ class FSFile
     @entry_pointer = entry_pointer
   end
 
+  # def self.new_file name, content="waka foo bar"
+  #   time = Time.now.to_i
+
+  #   block_ptr = BitMap.allocate(1).first
+
+  #   FileSystem.fat[block_ptr] = -1
+
+  #   file = self.new(block_ptr, name, 0, MAGIC_NUMBER[:file], time, time, time, 0)
+  #   file.write(content, file.block_ptr)
+  # end
+
   def update_entry
     entry = self.to_entry
     if self.parent == Directory.get_root
@@ -163,6 +174,19 @@ class Directory < FSFile
     return @@root
   end
 
+  def self.get_dir path
+    Directory.get_root
+  end
+
+  def list_entries
+    bytes = self.read(self.entries_qnt * ENTRY_SIZE, 0)
+    entry_list = []
+    (0...self.entries_qnt).each do |i|
+      entry_list << Directory.init_dir(bytes[i*ENTRY_SIZE, (i + 1)*ENTRY_SIZE], self, i*ENTRY_SIZE)
+    end
+    return entry_list.sort{|a, b| a.name <=> b.name}
+  end
+
   def self.init_dir entry, parent, entry_pointer
     name = entry.slice!(0, NAME_SIZE).strip
     pointer, size, type, a_date, c_date, m_date, entries_qnt = entry.unpack(ENTRY_FORMAT_STRING)
@@ -174,6 +198,11 @@ class Directory < FSFile
     dir = Directory.new_dir(name)
     self.add_entry(dir)
   end
+
+  # def touch name
+  #   file = FSFile.new_file(name)
+  #   self.add_entry(file)
+  # end
 
   def add_entry file
     entry_offset = self.entries_qnt * ENTRY_SIZE

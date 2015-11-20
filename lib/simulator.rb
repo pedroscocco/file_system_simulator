@@ -13,6 +13,7 @@ class Simulator
     rmdir:   1,
     cat:     1,
     touch:   1,
+    ls:      1,
     rm:      1,
     find:    2,
     df:      0,
@@ -66,8 +67,6 @@ class Simulator
   
   def mkdir args
     binding.pry
-    path = args[0]
-    self.file_system.mkdir()
     puts __method__
   end
   
@@ -81,6 +80,11 @@ class Simulator
   
   def touch args
     puts __method__
+  end
+
+  def ls args
+    path = args[0]
+    self.file_system.ls(path)
   end
   
   def rm args
