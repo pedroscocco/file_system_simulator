@@ -43,12 +43,11 @@ class FileSystem
     if !file_list.empty?
       printf("%s %s %s\n", "[File Type][File Name]", "[Size]", "[Last Changes]")
       file_list.each do |f|
-        # binding.pry
         file_type = (f.file_type == FSFile::MAGIC_NUMBER[:directory]) ? "Dir" : "File"
-        printf("%s %s %s %s\n","[" + file_type + "]" , "[" + f.name + "]" , "[" + (f.entries_qnt*Directory::ENTRY_SIZE).to_s + "]", "[" + Time.at(f.m_date).strftime("%d/%m/%Y -- %T") + "]")
+        printf("%-10s %-11.11s %-6s %s\n","[" + file_type + "]" , "[" + f.name + "]" , "[" + (f.entries_qnt*Directory::ENTRY_SIZE).to_s + "]", "[" + Time.at(f.m_date).strftime("%d/%m/%Y -- %T") + "]")
       end
-      printf("Empty\n")
     else
+      printf("Empty\n")
     end
   end
 
