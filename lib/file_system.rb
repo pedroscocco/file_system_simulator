@@ -40,15 +40,26 @@ class FileSystem
 
   def ls path
     path = '/' if path.nil?
-    file_list = self.get_path(path).list_entries
-    if !file_list.empty?
+    file = self.get_path(path)
+    if(!file.nil?)
       printf("%s %s %s\n", "[File Type][File Name]", "[Size]", "[Last Changes]")
-      file_list.each do |f|
-        file_type = (f.file_type == FSFile::MAGIC_NUMBER[:directory]) ? "Dir" : "File"
-        printf("%-10s %-11.11s %-6s %s\n","[" + file_type + "]" , "[" + f.name + "]" , "[" + (f.entries_qnt*Directory::ENTRY_SIZE).to_s + "]", "[" + Time.at(f.m_date).strftime("%d/%m/%Y -- %T") + "]")
+      if file.is_dir?
+        file_entries = file.list_entries
+        if !file_entries.empty?
+          file_entries.each do |f|
+            file_type = (f.file_type == FSFile::MAGIC_NUMBER[:directory]) ? "Dir" : "File"
+            entries_qnt = 0
+            printf("%-10s %-11.11s %-6s %s\n","[" + file_type + "]" , "[" + f.name + "]" , "[" + (entries_qnt*Directory::ENTRY_SIZE).to_s + "]", "[" + Time.at(f.m_date).strftime("%d/%m/%Y -- %T") + "]")
+          end
+        else
+          printf("Empty\n")
+        end
+      else
+        entries_qnt = 0
+        printf("%-10s %-11.11s %-6s %s\n","[" + "File" + "]" , "[" + file.name + "]" , "[" + (entries_qnt*Directory::ENTRY_SIZE).to_s + "]", "[" + Time.at(file.m_date).strftime("%d/%m/%Y -- %T") + "]")
       end
     else
-      printf("Empty\n")
+      printf("ls : cannot access #{path}: No such file or directory\n")
     end
   end
   
@@ -56,6 +67,12 @@ class FileSystem
     path, b, name = full_path.rpartition('/')
     dir = self.get_path(path)
     dir.mkdir(name)
+  end
+
+  def touch full_path
+    path, b, name = full_path.rpartition('/')
+    dir = self.get_path(path)
+    dir.touch(name)
   end
   
   def rmdir path
@@ -70,7 +87,7 @@ class FileSystem
     path_list.shift if path_list[0] == ""
     file = Directory.get_root
     path_list.each do |f|
-      file = file.get_entry f if file.is_dir?
+      file = file.get_entry f if(!file.nil? && file.is_dir?)
     end
     return file
   end

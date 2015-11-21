@@ -7,6 +7,7 @@ class FSFile
   }
 
   ENTRY_FORMAT_STRING = FS::INT_16 + FS::INT_32 + FS::INT_8 + (FS::INT_32 * 3) + FS::INT_16
+  NAME_SIZE = 128
   
   attr_accessor :pointer, :name, :size, :file_type, :a_date, :c_date, :m_date, :parent, :entry_pointer
 
@@ -26,16 +27,16 @@ class FSFile
     self.file_type == 0
   end
 
-  # def self.new_file name, content="waka foo bar"
-  #   time = Time.now.to_i
+  
+  def self.new_file name, parent=nil, content="waka foo bar"
+    time = Time.now.to_i
+    block_ptr = BitMap.allocate(1).first
+    FileSystem.fat[block_ptr] = -1
 
-  #   block_ptr = BitMap.allocate(1).first
-
-  #   FileSystem.fat[block_ptr] = -1
-
-  #   file = self.new(block_ptr, name, 0, MAGIC_NUMBER[:file], time, time, time, 0)
-  #   file.write(content, file.block_ptr)
-  # end
+    file = self.new(block_ptr, name, content.length, MAGIC_NUMBER[:file], time, time, time, parent)
+    file.write(content, file.pointer)
+    return file
+  end
 
   def update_entry
     entry = self.to_entry
@@ -45,21 +46,21 @@ class FSFile
       parent.write(entry, self.entry_pointer)
     end
   end
-
-  # def new_file name, size
-
-  # end
   
   def self.init_file entry, parent, entry_pointer
     name = entry.slice!(0, NAME_SIZE).strip
     pointer, size, type, a_date, c_date, m_date, entries_qnt = entry.unpack(ENTRY_FORMAT_STRING)
 
-    File.new(pointer, name, size, type, a_date, c_date, m_date, entries_qnt, parent, entry_pointer)
+    FSFile.new(pointer, name, size, type, a_date, c_date, m_date, parent, entry_pointer)
   end
 
   def to_entry
     name = ('%-128.128s' % self.name).gsub(' ', "\x00")
-    packed_values = [self.pointer, self.size, self.file_type, self.a_date, self.c_date, self.m_date, self.entries_qnt].pack(ENTRY_FORMAT_STRING)
+    if self.file_type == MAGIC_NUMBER[:directory]
+      packed_values = [self.pointer, self.size, self.file_type, self.a_date, self.c_date, self.m_date, self.entries_qnt].pack(ENTRY_FORMAT_STRING)
+    else
+      packed_values = [self.pointer, self.size, self.file_type, self.a_date, self.c_date, self.m_date, 0].pack(ENTRY_FORMAT_STRING)
+    end
     name + packed_values
   end
 
@@ -118,7 +119,6 @@ end
 class Directory < FSFile
 
 # Todos os valores em bytes
-  NAME_SIZE = 128
   POINTER_SIZE = 2
   SIZE_SIZE = 4
   TYPE_SIZE = 1
@@ -225,10 +225,10 @@ class Directory < FSFile
     self.add_entry(dir)
   end
 
-  # def touch name
-  #   file = FSFile.new_file(name)
-  #   self.add_entry(file)
-  # end
+  def touch name
+    file = FSFile.new_file(name, parent=self)
+    self.add_entry(file)
+  end
 
   def add_entry file
     entry_offset = self.entries_qnt * ENTRY_SIZE

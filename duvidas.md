@@ -35,6 +35,9 @@ Data(A) = 4 bytes
 Data(C) = 4 bytes 
 Data(M) = 4 bytes 
 
-TODO:: Preencher restante dos bytes inutilizados do BitMap com 1
-TODO:: Raise Exception quando a path nao existir. Talvez dar um try catch no simulador e pegar exception de path
-TODO:: Fazer o algoritmo do rmdir recursivo para apagar os subdiretorios tambem.
+[ ] TODO:: Preencher restante dos bytes inutilizados do BitMap com 1
+[ ] TODO : Escrever a quantidade necessária para ser alocada no método FSFile::new_file
+[ ] TODO:: Raise Exception quando a path nao existir. Talvez dar um try catch no simulador e pegar exception de path
+[ ] TODO:: Fazer o algoritmo do rmdir recursivo para apagar os subdiretorios tambem.
+[X] TODO:: Arrumar ls quando não existe diretório
+[ ] TODO : Size do arquivo está errado no ls

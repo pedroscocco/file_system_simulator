@@ -68,7 +68,11 @@ class Simulator
   
   def mkdir args
     path = args[0]
-    self.file_system.mkdir(path)
+    if valid_name(path)
+      self.file_system.mkdir(path)
+    else
+      puts "Erro ao criar diretório"
+    end
   end
   
   def rmdir args
@@ -81,6 +85,12 @@ class Simulator
   end
   
   def touch args
+    path = args[0]
+    if valid_name(path)
+      self.file_system.touch(path)
+    else
+      puts "Erro ao criar arquivo"
+    end
     puts __method__
   end
 
@@ -116,5 +126,12 @@ class Simulator
   
   def verbose args
     puts __method__
+  end
+
+  private 
+
+  def valid_name name
+    return true if (name != "/")
+    return false
   end
 end
