@@ -69,10 +69,15 @@ class FileSystem
     dir.mkdir(name)
   end
 
-  def touch full_path
-    path, b, name = full_path.rpartition('/')
-    dir = self.get_path(path)
-    dir.touch(name)
+  def cat path
+    path = '/' if path.nil?
+    file = self.get_path(path)
+    if(!file.nil?)
+      return "cat: #{path}: Is a directory" if file.is_dir?
+      return file.read(file.size, 0)
+    else
+      return "cat: #{path}: No such file or directory"
+    end
   end
   
   def rmdir path
@@ -80,6 +85,16 @@ class FileSystem
     dir = self.get_path(path)
     BitMap.set_free(dir.pointer)
     dir.parent.delete_entry dir.name
+  end
+
+  def touch_or_cp method, full_path, content
+    path, b, name = full_path.rpartition('/')
+    dir = self.get_path(path)
+    if(!dir.nil? && dir.is_dir? && name.size > 0)
+      dir.create_new_file(name, content)
+    else
+      puts "#{method}: cannot touch #{full_path}’: No such file or directory"
+    end
   end
 
   def get_path path

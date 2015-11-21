@@ -28,13 +28,13 @@ class FSFile
   end
 
   
-  def self.new_file name, parent=nil, content="waka foo bar"
+  def self.new_file name, parent=nil, content=""
     time = Time.now.to_i
     block_ptr = BitMap.allocate(1).first
     FileSystem.fat[block_ptr] = -1
 
     file = self.new(block_ptr, name, content.length, MAGIC_NUMBER[:file], time, time, time, parent)
-    file.write(content, file.pointer)
+    file.write(content, 0)
     return file
   end
 
@@ -225,8 +225,8 @@ class Directory < FSFile
     self.add_entry(dir)
   end
 
-  def touch name
-    file = FSFile.new_file(name, parent=self)
+  def create_new_file name, content
+    file = FSFile.new_file(name, parent=self, content)
     self.add_entry(file)
   end
 
