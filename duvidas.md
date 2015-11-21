@@ -42,3 +42,11 @@ Data(M) = 4 bytes
 [X] TODO:: Arrumar ls quando não existe diretório
 [ ] TODO : Size do arquivo está errado no ls
 [ ] TODO:: Se eu tiver uma pasta '/dev/null/' e der um touch em um arquivo chamado null em "/dev" o arquivo é criado, avaliar se precisamos tratar esse caso 
+[ ] TODO:: Levantar erro pro usuário montar a unidade antes de executar qlq comando
+
+Comandos : 
+
+[ ] RM
+[ ] Find
+[ ] Umount
+[ ] Mount correto
