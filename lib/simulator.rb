@@ -67,11 +67,13 @@ class Simulator
   end
   
   def mkdir args
-    puts __method__
+    path = args[0]
+    self.file_system.mkdir(path)
   end
   
   def rmdir args
-    puts __method__
+    path = args[0]
+    self.file_system.rmdir(path)
   end
   
   def cat args

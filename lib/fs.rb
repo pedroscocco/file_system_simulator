@@ -22,7 +22,7 @@ module FS
   INT_32             = 'l'
   INT_16             = 's'
   INT_8              = 'c'
-  U_INT_8              = 'C'
+  U_INT_8            = 'C'
 
   FAT_MAGIC_NUMBER   = 42
 

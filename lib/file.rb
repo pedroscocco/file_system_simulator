@@ -39,7 +39,7 @@ class FSFile
 
   def update_entry
     entry = self.to_entry
-    if self.parent == Directory.get_root
+    if self == Directory.get_root
       IO.write(FileSystem.path, entry, FS::ROOT_OFFSET)
     else
       parent.write(entry, self.entry_pointer)
@@ -235,5 +235,15 @@ class Directory < FSFile
     self.write(file.to_entry, entry_offset)
     file.entry_pointer = entry_offset
     self.entries_qnt = 1 + self.entries_qnt
+  end
+  
+  def delete_entry name
+    file = get_entry name
+    return nil if file.nil?
+    subentry_offset = (self.entries_qnt - 1) * ENTRY_SIZE
+    subentry = self.read(ENTRY_SIZE, subentry_offset)
+    self.write(subentry, file.entry_pointer)
+    self.entries_qnt = self.entries_qnt - 1
+    return file
   end
 end

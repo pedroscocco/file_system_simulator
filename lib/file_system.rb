@@ -51,6 +51,19 @@ class FileSystem
       printf("Empty\n")
     end
   end
+  
+  def mkdir full_path
+    path, b, name = full_path.rpartition('/')
+    dir = self.get_path(path)
+    dir.mkdir(name)
+  end
+  
+  def rmdir path
+    return if path == '/'
+    dir = self.get_path(path)
+    BitMap.set_free(dir.pointer)
+    dir.parent.delete_entry dir.name
+  end
 
   def get_path path
     path_list = path.split('/')
@@ -60,10 +73,6 @@ class FileSystem
       file = file.get_entry f if file.is_dir?
     end
     return file
-  end
-
-  def mkdir path
-
   end
 
   def create_new_partition
