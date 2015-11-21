@@ -66,6 +66,13 @@ class FSFile
     end
     name + packed_values
   end
+  
+  def to_s
+    file_type = (self.file_type == FSFile::MAGIC_NUMBER[:directory]) ? "D" : "F"
+    date = Time.at(self.m_date).strftime("%b %_d %R")
+    format = "%s %6.6s %s %s"
+    format % [file_type, self.size.to_human, date, self.name]
+  end
 
   def read n_bytes, offset
     start_block = offset / FS::BLOCK_SIZE
@@ -148,6 +155,10 @@ class Directory < FSFile
   def initialize pointer, name, size, file_type, a_date, c_date, m_date, entries_qnt, parent = nil, entry_pointer=0
     @entries_qnt = entries_qnt
     super(pointer, name, size, file_type, a_date, c_date, m_date, parent, entry_pointer)
+  end
+  
+  def size
+    self.entries_qnt * ENTRY_SIZE
   end
 
   def self.reset_root

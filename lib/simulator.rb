@@ -125,7 +125,8 @@ class Simulator
   end
   
   def rm args
-    puts __method__
+    path = args[0]
+    self.file_system.rm(path)
   end
   
   def find args

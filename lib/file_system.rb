@@ -46,21 +46,18 @@ class FileSystem
     path = '/' if path.nil?
     file = self.get_path(path)
     if(!file.nil?)
-      printf("%s %s %s\n", "[File Type][File Name]", "[Size]", "[Last Changes]")
+      puts "T   SIZE    DATE      NAME"
       if file.is_dir?
         file_entries = file.list_entries
         if !file_entries.empty?
           file_entries.each do |f|
-            file_type = (f.file_type == FSFile::MAGIC_NUMBER[:directory]) ? "Dir" : "File"
-            entries_qnt = 0
-            printf("%-10s %-11.11s %-6s %s\n","[" + file_type + "]" , "[" + f.name + "]" , "[" + (entries_qnt*Directory::ENTRY_SIZE).to_s + "]", "[" + Time.at(f.m_date).strftime("%d/%m/%Y -- %T") + "]")
+            puts f
           end
         else
           printf("Empty\n")
         end
       else
-        entries_qnt = 0
-        printf("%-10s %-11.11s %-6s %s\n","[" + "File" + "]" , "[" + file.name + "]" , "[" + (entries_qnt*Directory::ENTRY_SIZE).to_s + "]", "[" + Time.at(file.m_date).strftime("%d/%m/%Y -- %T") + "]")
+        puts file
       end
     else
       printf("ls : cannot access #{path}: No such file or directory\n")
@@ -84,9 +81,20 @@ class FileSystem
     end
   end
   
+  def rm path
+    file = self.get_path(path)
+    return nil if file.nil? || file.is_dir?
+    ptr = file.pointer
+    while (ptr != -1)
+      BitMap.set_free(ptr)
+      ptr = self.fat[ptr]
+    end
+    file.parent.delete_entry file.name
+  end
+  
   def rmdir path
-    return if path == '/'
     dir = self.get_path(path)
+    return if dir.nil? || dir == Directory.get_root()
     BitMap.set_free(dir.pointer)
     dir.parent.delete_entry dir.name
   end

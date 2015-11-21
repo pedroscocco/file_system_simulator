@@ -27,6 +27,15 @@ module FS
   FAT_MAGIC_NUMBER   = 42
 
   FULL_PATH = "/home/fsouto/Documentos/Study/usp/2015/2sem/so/eps/file_system_simulator/test"
+end
 
-
+# Human readable size
+class Numeric
+  def to_human
+    return "0B" if self == 0
+    units = %w{B KB MB GB TB}
+    e = (Math.log(self)/Math.log(1024)).floor
+    s = "%.1f" % (to_f / 1024**e)
+    s.sub(/\.?0*$/, units[e])
+  end
 end
