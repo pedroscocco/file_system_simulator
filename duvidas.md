@@ -38,3 +38,5 @@ Data(M) = 4 bytes
 TODO:: Preencher restante dos bytes inutilizados do BitMap com 1
 TODO : Escrever a quantidade necessária para ser alocada no método FSFile::new_file
 TODO : Size do arquivo está errado no ls
+TODO:: Raise Exception quando a path nao existir. Talvez dar um try catch no simulador e pegar exception de path
+TODO:: Fazer o algoritmo do rmdir recursivo para apagar os subdiretorios tambem.

@@ -13,12 +13,13 @@ class Simulator
     rmdir:   1,
     cat:     1,
     touch:   1,
-    ls:      1,
+    ls:      0,
     rm:      1,
     find:    2,
     df:      0,
     umount:  0,
     sai:     0,
+    debug:   0,
     verbose: 0
   }
 
@@ -66,18 +67,17 @@ class Simulator
   end
   
   def mkdir args
-    root = Directory.get_root()
-    dir_name = args[0]
-    if valid_name(dir_name)
-      root.mkdir(dir_name)
+    path = args[0]
+    if valid_name(path)
+      self.file_system.mkdir(path)
     else
       puts "Erro ao criar diretório"
     end
-    puts __method__
   end
   
   def rmdir args
-    puts __method__
+    path = args[0]
+    self.file_system.rmdir(path)
   end
   
   def cat args
@@ -119,6 +119,10 @@ class Simulator
   def sai args
     puts 'Good bye!'
     @exit_flag = true
+  end
+  
+  def debug args
+    binding.pry
   end
   
   def verbose args

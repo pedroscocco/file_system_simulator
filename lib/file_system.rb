@@ -38,28 +38,41 @@ class FileSystem
     root = Directory.get_root()
   end
 
-  def ls path="/"
-    file_list = Directory.get_dir("/").list_entries
+  def ls path
+    path = '/' if path.nil?
+    file_list = self.get_path(path).list_entries
     if !file_list.empty?
       printf("%s %s %s\n", "[File Type][File Name]", "[Size]", "[Last Changes]")
       file_list.each do |f|
         file_type = (f.file_type == FSFile::MAGIC_NUMBER[:directory]) ? "Dir" : "File"
-        printf("%s %s %s %s\n","[" + file_type + "]" , "[" + f.name + "]" , "[" + (f.entries_qnt*Directory::ENTRY_SIZE).to_s + "]", "[" + Time.at(f.m_date).strftime("%d/%m/%Y -- %T") + "]")
+        printf("%-10s %-11.11s %-6s %s\n","[" + file_type + "]" , "[" + f.name + "]" , "[" + (f.entries_qnt*Directory::ENTRY_SIZE).to_s + "]", "[" + Time.at(f.m_date).strftime("%d/%m/%Y -- %T") + "]")
       end
-      printf("Empty\n")
     else
+      printf("Empty\n")
     end
   end
+  
+  def mkdir full_path
+    path, b, name = full_path.rpartition('/')
+    dir = self.get_path(path)
+    dir.mkdir(name)
+  end
+  
+  def rmdir path
+    return if path == '/'
+    dir = self.get_path(path)
+    BitMap.set_free(dir.pointer)
+    dir.parent.delete_entry dir.name
+  end
 
-  def get_dir path
-    path_list = path.split(',')[1..-1]
+  def get_path path
+    path_list = path.split('/')
+    path_list.shift if path_list[0] == ""
+    file = Directory.get_root
     path_list.each do |f|
-
+      file = file.get_entry f if file.is_dir?
     end
-  end
-
-  def mkdir path
-
+    return file
   end
 
   def create_new_partition
