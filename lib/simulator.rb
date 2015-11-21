@@ -66,7 +66,13 @@ class Simulator
   end
   
   def mkdir args
-    binding.pry
+    root = Directory.get_root()
+    dir_name = args[0]
+    if valid_name(dir_name)
+      root.mkdir(dir_name)
+    else
+      puts "Erro ao criar diretório"
+    end
     puts __method__
   end
   
@@ -79,6 +85,13 @@ class Simulator
   end
   
   def touch args
+    root = Directory.get_root()
+    file_name = args[0]
+    if valid_name(file_name)
+      root.touch(file_name)
+    else
+      puts "Erro ao criar arquivo"
+    end
     puts __method__
   end
 
@@ -110,5 +123,12 @@ class Simulator
   
   def verbose args
     puts __method__
+  end
+
+  private 
+
+  def valid_name name
+    return true if (name != "/")
+    return false
   end
 end

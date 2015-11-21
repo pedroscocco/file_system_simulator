@@ -22,16 +22,18 @@ class FSFile
     @entry_pointer = entry_pointer
   end
 
-  # def self.new_file name, content="waka foo bar"
-  #   time = Time.now.to_i
+  #TODO : Escrever a quantidade necessária para ser alocada!
+  def self.new_file name, parent=nil, content="waka foo bar"
+    time = Time.now.to_i
+    content = content*130
+    content = content + "<x>"
+    block_ptr = BitMap.allocate(1).first
+    FileSystem.fat[block_ptr] = -1
 
-  #   block_ptr = BitMap.allocate(1).first
-
-  #   FileSystem.fat[block_ptr] = -1
-
-  #   file = self.new(block_ptr, name, 0, MAGIC_NUMBER[:file], time, time, time, 0)
-  #   file.write(content, file.block_ptr)
-  # end
+    file = self.new(block_ptr, name, content.length, MAGIC_NUMBER[:file], time, time, time, parent)
+    file.write(content, file.pointer)
+    return file
+  end
 
   def update_entry
     entry = self.to_entry
@@ -48,7 +50,11 @@ class FSFile
 
   def to_entry
     name = ('%-128.128s' % self.name).gsub(' ', "\x00")
-    packed_values = [self.pointer, self.size, self.file_type, self.a_date, self.c_date, self.m_date, self.entries_qnt].pack(ENTRY_FORMAT_STRING)
+    if self.file_type == MAGIC_NUMBER[:directory]
+      packed_values = [self.pointer, self.size, self.file_type, self.a_date, self.c_date, self.m_date, self.entries_qnt].pack(ENTRY_FORMAT_STRING)
+    else
+      packed_values = [self.pointer, self.size, self.file_type, self.a_date, self.c_date, self.m_date, 0].pack(ENTRY_FORMAT_STRING)
+    end
     name + packed_values
   end
 
@@ -199,10 +205,10 @@ class Directory < FSFile
     self.add_entry(dir)
   end
 
-  # def touch name
-  #   file = FSFile.new_file(name)
-  #   self.add_entry(file)
-  # end
+  def touch name
+    file = FSFile.new_file(name, parent=self)
+    self.add_entry(file)
+  end
 
   def add_entry file
     entry_offset = self.entries_qnt * ENTRY_SIZE
