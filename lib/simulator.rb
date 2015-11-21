@@ -23,6 +23,18 @@ class Simulator
     verbose: 0
   }
 
+  FILTHREAD_COMMANDS = [
+    :cp,
+    :mkdir,
+    :rmdir,
+    :cat,
+    :touch,
+    :ls,
+    :rm,
+    :find,
+    :df
+  ]
+
   attr_accessor :exit_flag, :file_system
 
   def initialize
@@ -49,17 +61,25 @@ class Simulator
         puts "Argumentos faltando"
         return
       end
-      
-      self.send( command, args)
+      if(FILTHREAD_COMMANDS.include?(command))
+        before_command(command, args)
+      else
+        self.send(command, args)
+      end
     else
-      puts "Comando não reconhecido"
+      puts "[ep3]: Command not found: #{command}"
     end
   end
   
   def mount args
     path = args[0]
-    self.file_system = FileSystem.get_instance(path)
-    self.file_system.mount
+    if(self.file_system.nil?)
+      self.file_system = FileSystem.get_instance(path)
+      self.file_system.mount
+      puts "Mount Success : Unit '#{path}' is mounted and ready to use."
+    else
+      puts "Erro : Unit '#{self.file_system.path}' is already mounted.\nPlease umount '#{self.file_system.path}' first before mount '#{path}'."
+    end
   end
   
   def cp args
@@ -95,7 +115,7 @@ class Simulator
     if valid_name(path)
       self.file_system.touch_or_cp("touch", path, content="")
     else
-      puts "Erro ao criar arquivo"
+      puts "Error while creating file"
     end
   end
 
@@ -117,7 +137,19 @@ class Simulator
   end
   
   def umount args
-    puts __method__
+    path = args[0]
+    if(!self.file_system.nil?)
+      if(self.file_system.path == path)
+        Directory.reset_root()
+        FileSystem.reset_file_system()
+        self.file_system = nil
+        puts "Umount Success : Unit '#{path}' is not longer monted."
+      else
+        puts "Erro : Unit '#{path}' is not mounted.\nPlease try again or run 'df' to see specs about the current mounted partition."
+      end
+    else
+      puts "Erro : There is no partition mounted."
+    end
   end
   
   def sai args
@@ -138,5 +170,10 @@ class Simulator
   def valid_name name
     return true if (name != "/")
     return false
+  end
+
+  def before_command method, args
+    return puts "Erro : There is no partition mounted." if self.file_system.nil?
+    self.send(method, args)
   end
 end

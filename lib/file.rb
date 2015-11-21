@@ -150,6 +150,10 @@ class Directory < FSFile
     super(pointer, name, size, file_type, a_date, c_date, m_date, parent, entry_pointer)
   end
 
+  def self.reset_root
+    @@root = nil
+  end
+
   def entries_qnt=(value)
     @entries_qnt = value
     self.update_entry

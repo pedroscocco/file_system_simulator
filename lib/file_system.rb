@@ -16,6 +16,10 @@ class FileSystem
     @fat = nil
   end
 
+  def self.reset_file_system
+    @@file_system = nil
+  end
+
   def self.get_instance path
     return @@file_system if !@@file_system.nil?
     @@file_system = FileSystem.new(path)
