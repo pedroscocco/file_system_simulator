@@ -63,7 +63,12 @@ class Simulator
   end
   
   def cp args
-    puts __method__
+    source        = args[0]
+    destination   = args[1]
+    content       = IO.read(source)
+    self.file_system.touch_or_cp("cp", destination, content)
+  rescue Exception => e
+    puts e.message
   end
   
   def mkdir args
@@ -81,17 +86,17 @@ class Simulator
   end
   
   def cat args
-    puts __method__
+    path = args[0]
+    puts self.file_system.cat(path)
   end
   
   def touch args
     path = args[0]
     if valid_name(path)
-      self.file_system.touch(path)
+      self.file_system.touch_or_cp("touch", path, content="")
     else
       puts "Erro ao criar arquivo"
     end
-    puts __method__
   end
 
   def ls args
