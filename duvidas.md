@@ -36,4 +36,5 @@ Data(C) = 4 bytes
 Data(M) = 4 bytes 
 
 TODO:: Preencher restante dos bytes inutilizados do BitMap com 1
-
+TODO : Escrever a quantidade necessária para ser alocada no método FSFile::new_file
+TODO : Size do arquivo está errado no ls

@@ -38,7 +38,6 @@ class FileSystem
     root = Directory.get_root()
   end
 
-  #TODO : Size do arquivo está errado!
   def ls path="/"
     file_list = Directory.get_dir("/").list_entries
     if !file_list.empty?

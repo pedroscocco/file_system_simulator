@@ -22,7 +22,7 @@ class FSFile
     @entry_pointer = entry_pointer
   end
 
-  #TODO : Escrever a quantidade necessária para ser alocada!
+  
   def self.new_file name, parent=nil, content="waka foo bar"
     time = Time.now.to_i
     content = content*130
@@ -43,11 +43,7 @@ class FSFile
       parent.write(entry, self.entry_pointer)
     end
   end
-
-  # def new_file name, size
-
-  # end
-
+  
   def to_entry
     name = ('%-128.128s' % self.name).gsub(' ', "\x00")
     if self.file_type == MAGIC_NUMBER[:directory]
