@@ -30,10 +30,13 @@ class FSFile
   
   def self.new_file name, parent=nil, content=""
     time = Time.now.to_i
-    block_ptr = BitMap.allocate(1).first
-    FileSystem.fat[block_ptr] = -1
+    content_size = (content.size > 0) ? content.size : 1
+    n_blocks = (content_size.to_f / FS::BLOCK_SIZE).ceil
+    block_ptrs = BitMap.allocate(n_blocks)
+    FileSystem.fat.update(block_ptrs)
 
-    file = self.new(block_ptr, name, content.length, MAGIC_NUMBER[:file], time, time, time, parent)
+
+    file = self.new(block_ptrs.first, name, content_size, MAGIC_NUMBER[:file], time, time, time, parent)
     file.write(content, 0)
     return file
   end
@@ -155,11 +158,11 @@ class Directory < FSFile
   def self.new_dir name
     time = Time.now.to_i
 
-    block_ptr = BitMap.allocate(1).first
+    block_ptrs = BitMap.allocate(1)
 
-    FileSystem.fat[block_ptr] = -1
+    FileSystem.fat.update(block_ptrs)
 
-    self.new(block_ptr, name, 0, MAGIC_NUMBER[:directory], time, time, time, 0)
+    self.new(block_ptrs.first, name, 0, MAGIC_NUMBER[:directory], time, time, time, 0)
   end
  
   def self.create_root
