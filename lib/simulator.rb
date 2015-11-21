@@ -85,10 +85,9 @@ class Simulator
   end
   
   def touch args
-    root = Directory.get_root()
-    file_name = args[0]
-    if valid_name(file_name)
-      root.touch(file_name)
+    path = args[0]
+    if valid_name(path)
+      self.file_system.touch(path)
     else
       puts "Erro ao criar arquivo"
     end

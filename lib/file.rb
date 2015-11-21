@@ -7,6 +7,7 @@ class FSFile
   }
 
   ENTRY_FORMAT_STRING = FS::INT_16 + FS::INT_32 + FS::INT_8 + (FS::INT_32 * 3) + FS::INT_16
+  NAME_SIZE = 128
   
   attr_accessor :pointer, :name, :size, :file_type, :a_date, :c_date, :m_date, :parent, :entry_pointer
 
@@ -29,8 +30,6 @@ class FSFile
   
   def self.new_file name, parent=nil, content="waka foo bar"
     time = Time.now.to_i
-    content = content*130
-    content = content + "<x>"
     block_ptr = BitMap.allocate(1).first
     FileSystem.fat[block_ptr] = -1
 
@@ -52,7 +51,7 @@ class FSFile
     name = entry.slice!(0, NAME_SIZE).strip
     pointer, size, type, a_date, c_date, m_date, entries_qnt = entry.unpack(ENTRY_FORMAT_STRING)
 
-    File.new(pointer, name, size, type, a_date, c_date, m_date, entries_qnt, parent, entry_pointer)
+    FSFile.new(pointer, name, size, type, a_date, c_date, m_date, parent, entry_pointer)
   end
 
   def to_entry
@@ -120,7 +119,6 @@ end
 class Directory < FSFile
 
 # Todos os valores em bytes
-  NAME_SIZE = 128
   POINTER_SIZE = 2
   SIZE_SIZE = 4
   TYPE_SIZE = 1
