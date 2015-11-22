@@ -135,10 +135,10 @@ class FileSystem
 
   def create_new_partition
     IO.write(self.path, ([0]*FS::PARTITION_SIZE).pack(FS::INT_8 + '*'))
+    
+    superblock_data = [FS::FAT_MAGIC_NUMBER, FS::DATA_BLOCKS, FS::FREE_SPACE_OFFSET, FS::FAT_OFFSET, FS::ROOT_OFFSET, FS::DATA_OFFSET].pack(FS::INT_16 + '*')
 
-    data_blocks_size = (FS::PARTITION_SIZE - FS::FREE_SPACE_SIZE - FS::FAT_SIZE) / FS::BLOCK_SIZE
-
-    IO.write(self.path, [FS::FAT_MAGIC_NUMBER, data_blocks_size].pack(FS::INT_16 * 2), FS::SUPER_BLOCK_OFFSET)
+    IO.write(self.path, superblock_data, FS::SUPER_BLOCK_OFFSET)
 
     @fat = Fat.new()
     
