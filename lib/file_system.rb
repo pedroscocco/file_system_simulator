@@ -179,13 +179,23 @@ class FileSystem
         stack.push(*file.list_entries)
       else
         files += 1
-        wasted += FS::BLOCK_SIZE - (file.size % FS::BLOCK_SIZE)
+        wasted += -(file.size % FS::BLOCK_SIZE) % FS::BLOCK_SIZE
       end
     end
     puts "DIRECTORIES  %d" % directories
     puts "FILES        %d" % files
     puts "FREE SPACE   %d ~ %s" % [free, free.to_human]
     puts "WASTED SPACE %d ~ %s" % [wasted, wasted.to_human]
+  end
+  
+  def find path, name
+    dir = self.get_path(path)
+    return nil if dir.nil? || !dir.is_dir?
+    result = []
+    path = '/' + path if path[0] != '/'
+    path.slice!(-1, 1) if path.end_with?('/')
+    dir.find result, path, name
+    puts result
   end
 
   def umount

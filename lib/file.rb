@@ -227,6 +227,21 @@ class Directory < FSFile
     end
     return entry_list.sort{|a, b| a.name <=> b.name}
   end
+  
+  def find result, path, name
+    entries = self.list_entries
+    dirs = []
+    entries.each do |entry|
+      if entry.is_dir?
+        dirs << entry
+      else
+        result << path + '/' + name if entry.name == name
+      end
+    end
+    dirs.each do |dir|
+      dir.find result, path + '/' + dir.name, name
+    end
+  end
 
   def self.init_dir entry, parent, entry_pointer
     name = entry.slice!(0, NAME_SIZE).strip

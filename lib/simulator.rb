@@ -133,7 +133,8 @@ class Simulator
   end
   
   def find args
-    puts __method__
+    path, name = args[0, 2]
+    self.file_system.find path, name
   end
   
   def df args

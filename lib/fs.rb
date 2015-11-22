@@ -1,8 +1,8 @@
 module FS
-  BLOCK_SIZE         = 1024
+  BLOCK_SIZE         = 4000
 
   #Todos tamanhos são em bytes
-  PARTITION_SIZE     = 24 * BLOCK_SIZE
+  PARTITION_SIZE     = 26214 * BLOCK_SIZE
 
   SUPER_BLOCK_OFFSET = 0 
   SUPER_BLOCK_SIZE   = 1  * BLOCK_SIZE
@@ -11,7 +11,7 @@ module FS
   FREE_SPACE_SIZE    = 1  * BLOCK_SIZE
 
   FAT_OFFSET         = FREE_SPACE_OFFSET + FREE_SPACE_SIZE
-  FAT_SIZE           = 12  * BLOCK_SIZE
+  FAT_SIZE           = 13  * BLOCK_SIZE
 
   ROOT_OFFSET        = FAT_OFFSET + FAT_SIZE
   ROOT_SIZE          = 1  * BLOCK_SIZE
