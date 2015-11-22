@@ -20,7 +20,9 @@ class Simulator
     umount:  0,
     sai:     0,
     debug:   0,
-    verbose: 0
+    verbose: 0,
+    test:    3,
+    full_simulation: 0
   }
 
   FILTHREAD_COMMANDS = [
@@ -163,6 +165,92 @@ class Simulator
   
   def verbose args
     puts __method__
+  end
+
+  # test <cmd> <times> <source>
+  def full_simulation args
+    partition = ["empty", "low", "medium"]
+    file_size = [1,10, 30]
+    command = ["cp"]
+    times = 30
+    partition.each do |p|
+      puts("Mouting partition : #{p} ...")
+      self.send("mount", [p])
+      file_size.each do |f|
+        puts("Executing file : #{f} ...")
+        file = "input/file_teste_##{f}.txt"
+        command.each do |c|
+          puts("Executing command : #{c} ...")
+          self.send("test", [c, times, file, p, f])
+        end
+      end
+      self.send("umount", [p])
+      puts("Umouting partition : #{p} ...\n")
+    end
+  end
+
+  def test args
+
+    command = args[0]
+    times = args[1].to_i
+    source = args[2]
+    partition = args[3]
+    file_size = args[4]
+    times_array = Array.new
+    path = "/home/fsouto/Documentos/Study/usp/2015/2sem/so/eps/file_system_simulator/"
+    log_path = path + "/logs/" + "#{partition}-#{command}-#{file_size}-#{Time.now.to_i}.txt"
+    file = File.open(log_path, "w+")
+    file.write(">"*140)
+    file.write("Starting the simulatfilen")
+    file.write("Partition : #{partition}\nCommand : #{command}\nFile Size : #{file_size}\nTimes : #{times}\nPath : #{source}\n")
+    file_path = path + source
+    if(command == "cp")
+      reverse_command = "rm"
+      reverse_args = ["/fileteste1.txt"]
+      cmd_args = [file_path, "/fileteste1.txt"]
+    else 
+      reverse_command = "cp"
+      cmd_args = ["/fileteste1.txt"]
+      reverse_args = [file_path, "/fileteste1.txt"]
+    end
+    
+    (0...times).each_with_index do |i|
+      interation = {}
+      
+      start = Time.now.to_f
+      self.send(command, cmd_args)
+      endd = Time.now.to_f
+      interation[:cp] = {start: start, endd: endd, index: i}
+      
+      start = Time.now.to_f
+      self.send(reverse_command, reverse_args)
+      endd = Time.now.to_f
+      interation[:rm] = {start: start, endd: endd, index: i}
+      
+      times_array << interation
+    end
+
+    average = {}
+    average[:cp] = 0.0
+    average[:rm] = 0.0
+
+    sum = {}
+    sum[:cp] = 0.0
+    sum[:rm] = 0.0
+
+    times_array.each do |t|
+      sum[:cp] += (t[:cp][:endd] - t[:cp][:start])
+      sum[:rm] += (t[:rm][:endd] - t[:rm][:start])
+    end
+    average[:cp] = sum[:cp] /(times * 1.0)
+    average[:rm] = sum[:rm] /(times * 1.0)
+    file.write("TIMES : #{times}\n")
+    file.write("SUM CP : #{sum[:cp]}\n")
+    file.write("AVERAGE TIME CP: #{average[:rm]}\n\n")
+    file.write("SUM RM : #{sum[:rm]}\n")
+    file.write("AVERAGE TIME RM: #{average[:cp]}\n")
+    file.write("<"*140)
+    file.close
   end
 
   private 

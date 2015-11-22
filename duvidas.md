@@ -35,18 +35,16 @@ Data(A) = 4 bytes
 Data(C) = 4 bytes 
 Data(M) = 4 bytes 
 
-[ ] TODO:: Preencher restante dos bytes inutilizados do BitMap com 1
 [X] TODO : Escrever a quantidade necessária para ser alocada no método FSFile::new_file
-[ ] TODO:: Raise Exception quando a path nao existir. Talvez dar um try catch no simulador e pegar exception de path
+[X] TODO:: Raise Exception quando a path nao existir. Talvez dar um try catch no simulador e pegar exception de path
 [ ] TODO:: Fazer o algoritmo do rmdir recursivo para apagar os subdiretorios tambem.
 [X] TODO:: Arrumar ls quando não existe diretório
-[ ] TODO : Size do arquivo está errado no ls
-[ ] TODO:: Se eu tiver uma pasta '/dev/null/' e der um touch em um arquivo chamado null em "/dev" o arquivo é criado, avaliar se precisamos tratar esse caso 
+[X] TODO : Size do arquivo está errado no ls
 [X] TODO:: Levantar erro pro usuário montar a unidade antes de executar qlq comando
 
 Comandos : 
 
-[ ] RM
+[X] RM
 [ ] Find
 [X] Umount
 [X] Mount correto
