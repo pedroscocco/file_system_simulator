@@ -87,7 +87,7 @@ class Simulator
     source        = args[0]
     destination   = args[1]
     content       = IO.read(source)
-    self.file_system.touch_or_cp("cp", destination, content)
+    self.file_system.cp(destination, content)
   rescue Exception => e
     puts "Erro while creating file : #{e.message}"
   end
@@ -114,7 +114,7 @@ class Simulator
   def touch args
     path = args[0]
     if valid_name(path)
-      self.file_system.touch_or_cp("touch", path, content="")
+      self.file_system.touch(path, content="")
     else
       puts "Error while creating file : invalid name"
     end

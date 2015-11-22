@@ -113,14 +113,33 @@ class FileSystem
     self.rmfile dir
   end
 
-  def touch_or_cp method, full_path, content
+  def cp full_path, content
     path, b, name = full_path.rpartition('/')
     dir = self.get_path(path)
     if(!dir.nil? && dir.is_dir? && name.size > 0)
       dir.create_new_file(name, content)
     else
-      puts "#{method}: cannot touch #{full_path}’: No such file or directory"
+      puts "cp: cannot copy #{full_path}’: No such file or directory"
     end
+  end
+
+  def touch full_path, content
+    path, b, name = full_path.rpartition('/')
+
+    file = self.get_path(name)
+    if(!file.nil? && name.size > 0)
+      file.a_date = Time.now.to_i
+      file.update_entry
+      return
+    end
+
+    dir = self.get_path(path)
+    if(!dir.nil? && dir.is_dir? && name.size > 0)
+      dir.create_new_file(name, content)
+      return
+    end
+
+    puts "touch: cannot create #{full_path}’: No such file or directory"
   end
 
   def get_path path
