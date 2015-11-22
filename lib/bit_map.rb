@@ -24,6 +24,20 @@ class BitMap
     return allocated
   end
   
+  def free_blocks blocks
+    bytes = IO.read(FileSystem.path, (FS::DATA_BLOCKS / 8.0).ceil, FS::FREE_SPACE_OFFSET).unpack(FS::U_INT_8 + '*')
+    
+    blocks.each do |index|
+      byte = bytes[index/8]
+  
+      mask = 1 << index%8
+      
+      bytes[index/8] = byte & ~mask
+    end
+    
+    IO.write(FileSystem.path, bytes.pack(FS::U_INT_8 + '*'), FS::FREE_SPACE_OFFSEToffset)
+  end
+  
   def self.free_space
     count = 0
     bytes = IO.read(FileSystem.path, (FS::DATA_BLOCKS / 8.0).ceil, FS::FREE_SPACE_OFFSET).unpack(FS::U_INT_8 + '*')
