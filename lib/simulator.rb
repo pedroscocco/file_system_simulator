@@ -88,7 +88,7 @@ class Simulator
     content       = IO.read(source)
     self.file_system.touch_or_cp("cp", destination, content)
   rescue Exception => e
-    puts e.message
+    puts "Erro while creating file : #{e.message}"
   end
   
   def mkdir args
@@ -96,7 +96,7 @@ class Simulator
     if valid_name(path)
       self.file_system.mkdir(path)
     else
-      puts "Erro ao criar diretório"
+      puts "Erro while creating directory : invalid name"
     end
   end
   
@@ -115,8 +115,10 @@ class Simulator
     if valid_name(path)
       self.file_system.touch_or_cp("touch", path, content="")
     else
-      puts "Error while creating file"
+      puts "Error while creating file : invalid name"
     end
+  rescue Exception => e
+    puts "Erro while creating file : #{e.message}"
   end
 
   def ls args
@@ -138,16 +140,12 @@ class Simulator
   end
   
   def umount args
-    path = args[0]
     if(!self.file_system.nil?)
-      if(self.file_system.path == path)
-        Directory.reset_root()
-        FileSystem.reset_file_system()
-        self.file_system = nil
-        puts "Umount Success : Unit '#{path}' is not longer monted."
-      else
-        puts "Erro : Unit '#{path}' is not mounted.\nPlease try again or run 'df' to see specs about the current mounted partition."
-      end
+      current_path = FileSystem.path
+      Directory.reset_root()
+      FileSystem.reset_file_system()
+      self.file_system = nil
+      puts "Umount Success : Unit '#{current_path}' is not longer monted."
     else
       puts "Erro : There is no partition mounted."
     end
