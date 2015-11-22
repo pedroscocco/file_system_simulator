@@ -23,6 +23,16 @@ class BitMap
 
     return allocated
   end
+  
+  def self.free_space
+    count = 0
+    bytes = IO.read(FileSystem.path, (FS::DATA_BLOCKS / 8.0).ceil, FS::FREE_SPACE_OFFSET).unpack(FS::U_INT_8 + '*')
+    (0...FS::DATA_BLOCKS).each do |i|
+      bit = bytes[i/8] & (1 << i%8)
+      count += 1 if bit == 0
+    end
+    return count * FS::BLOCK_SIZE
+  end
 
   def self.get(index)
     offset = FS::FREE_SPACE_OFFSET + index/8

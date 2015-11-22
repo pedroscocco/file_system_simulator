@@ -145,6 +145,29 @@ class FileSystem
     
     Directory.create_root
   end
+  
+  def df
+    #quantidade de diretorios, quantidade de arquivos, espaco livre, espaco desperdicado
+    free = BitMap.free_space
+    directories = 0
+    files = 0
+    wasted = 0
+    stack = [Directory.get_root]
+    while !stack.empty?
+      file = stack.pop
+      if file.is_dir?
+        directories += 1
+        stack.push(*file.list_entries)
+      else
+        files += 1
+        wasted += FS::BLOCK_SIZE - (file.size % FS::BLOCK_SIZE)
+      end
+    end
+    puts "DIRECTORIES  %d" % directories
+    puts "FILES        %d" % files
+    puts "FREE SPACE   %d ~ %s" % [free, free.to_human]
+    puts "WASTED SPACE %d ~ %s" % [wasted, wasted.to_human]
+  end
 
   def umount
     @@file_system = nil

@@ -137,7 +137,7 @@ class Simulator
   end
   
   def df args
-    puts __method__
+    self.file_system.df
   end
   
   def umount args
