@@ -46,7 +46,8 @@ class FileSystem
     path = '/' if path.nil?
     file = self.get_path(path)
     if(!file.nil?)
-      puts "T   SIZE    DATE      NAME"
+      puts "T   SIZE   ACCESS DATE    MODIFY DATE    NAME"
+           #D     0B | Nov 22 00:53 | Nov 22 00:53 | dev
       if file.is_dir?
         file_entries = file.list_entries
         if !file_entries.empty?
