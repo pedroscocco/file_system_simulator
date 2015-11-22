@@ -19,8 +19,7 @@ class Simulator
     df:      0,
     umount:  0,
     sai:     0,
-    debug:   0,
-    verbose: 0
+    debug:   0
   }
 
   FILTHREAD_COMMANDS = [

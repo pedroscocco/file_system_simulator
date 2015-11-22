@@ -25,8 +25,6 @@ module FS
   U_INT_8            = 'C'
 
   FAT_MAGIC_NUMBER   = 42
-
-  FULL_PATH = "/home/fsouto/Documentos/Study/usp/2015/2sem/so/eps/file_system_simulator/test"
 end
 
 # Human readable size
