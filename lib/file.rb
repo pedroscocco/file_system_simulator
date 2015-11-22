@@ -69,9 +69,10 @@ class FSFile
   
   def to_s
     file_type = (self.file_type == FSFile::MAGIC_NUMBER[:directory]) ? "D" : "F"
-    date = Time.at(self.m_date).strftime("%b %_d %R")
-    format = "%s %6.6s %s %s"
-    format % [file_type, self.byte_size.to_human, date, self.name]
+    m_date = Time.at(self.m_date).strftime("%b %_d %R")
+    a_date = Time.at(self.a_date).strftime("%b %_d %R")
+    format = "%s %6.6s | %s | %s | %s"
+    format % [file_type, self.byte_size.to_human, a_date, m_date, self.name]
   end
 
   def read n_bytes, offset
