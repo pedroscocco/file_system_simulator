@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+
+src = File.expand_path('../src', __FILE__)
+$LOAD_PATH.unshift(src) unless $LOAD_PATH.include?(src)
+
+require 'simulator'
+
+Simulator.new.main

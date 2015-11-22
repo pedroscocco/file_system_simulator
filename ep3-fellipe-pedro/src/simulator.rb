@@ -1,6 +1,5 @@
 # encoding: utf-8
 require 'readline'
-require 'pry'
 
 require_relative 'file_system'
 
@@ -18,8 +17,7 @@ class Simulator
     find:    2,
     df:      0,
     umount:  0,
-    sai:     0,
-    debug:   0
+    sai:     0
   }
 
   FILTHREAD_COMMANDS = [
@@ -155,10 +153,6 @@ class Simulator
   def sai args
     puts 'Good bye!'
     @exit_flag = true
-  end
-  
-  def debug args
-    binding.pry
   end
 
   private 

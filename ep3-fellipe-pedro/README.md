@@ -14,19 +14,21 @@
 ################################################################################
                                Como Compilar?
 ################################################################################
+
   O programa não precisa ser compilado, está escrito inteiramente na linguagem de script Ruby (https://www.ruby-lang.org/). 
   Para executar basta ter o ruby instalado, via binário ou RVM (https://rvm.io/). Recomendamos uma versão >= 2.0
 
 ################################################################################
                                Como executar?
 ################################################################################
+
   Para executar o programa pode-se executar o comando : 
 
 $ ./run
 
-  Ou direto na pasta 'src/' o comando:
+  Ou direto na pasta 'src/' rodando o comando:
 
-$ ruby simulator.rb
+$ ruby run.rb
     
 ################################################################################
                                Comandos do EP3
