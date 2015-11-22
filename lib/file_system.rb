@@ -83,7 +83,15 @@ class FileSystem
   
   def rm path
     file = self.get_path(path)
-    return nil if file.nil? || file.is_dir?
+    return nil if file.nil?
+    if file.is_dir?
+      self.rmdir file
+    else
+      self.rmfile file
+    end
+  end
+  
+  def rmfile file
     ptr = file.pointer
     while (ptr != -1)
       BitMap.set_free(ptr)
@@ -92,11 +100,17 @@ class FileSystem
     file.parent.delete_entry file.name
   end
   
-  def rmdir path
-    dir = self.get_path(path)
-    return if dir.nil? || dir == Directory.get_root()
-    BitMap.set_free(dir.pointer)
-    dir.parent.delete_entry dir.name
+  def rmdir dir
+    return if dir == Directory.get_root()
+    entries = dir.list_entries
+    entries.each do |entry|
+      if entry.is_dir?
+        self.rmdir entry
+      else
+        self.rmfile entry
+      end
+    end
+    self.rmfile dir
   end
 
   def touch_or_cp method, full_path, content

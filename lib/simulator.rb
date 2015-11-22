@@ -45,14 +45,15 @@ class Simulator
   def main
     while !@exit_flag
       command, args = read_command
-      run_command(command, args)
+      next if command.nil? || command == ""
+      run_command(command.to_sym, args)
     end
   end
 
   def read_command
     input = Readline.readline('[ep3]: ', true)
     args = input.chomp.split
-    [args.shift.to_sym, args]
+    [args.shift, args]
   end
 
   def run_command command, args
@@ -102,7 +103,7 @@ class Simulator
   
   def rmdir args
     path = args[0]
-    self.file_system.rmdir(path)
+    self.file_system.rm(path)
   end
   
   def cat args
