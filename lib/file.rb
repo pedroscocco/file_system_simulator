@@ -22,9 +22,13 @@ class FSFile
     @parent = parent
     @entry_pointer = entry_pointer
   end
-  
+
   def is_dir?
     self.file_type == 0
+  end
+
+  def byte_size
+    self.size
   end
 
   
@@ -33,11 +37,14 @@ class FSFile
     content_size = (content.size > 0) ? content.size : 1
     n_blocks = (content_size.to_f / FS::BLOCK_SIZE).ceil
     block_ptrs = BitMap.allocate(n_blocks)
+
+    raise Exception.new("Disk full") if block_ptrs.empty?
+
     FileSystem.fat.update(block_ptrs)
-
-
     file = self.new(block_ptrs.first, name, content_size, MAGIC_NUMBER[:file], time, time, time, parent)
-    file.write(content, 0)
+    writed_bytes = file.write(content, 0)
+    file.size = writed_bytes
+
     return file
   end
 
@@ -48,13 +55,6 @@ class FSFile
     else
       parent.write(entry, self.entry_pointer)
     end
-  end
-  
-  def self.init_file entry, parent, entry_pointer
-    name = entry.slice!(0, NAME_SIZE).strip
-    pointer, size, type, a_date, c_date, m_date, entries_qnt = entry.unpack(ENTRY_FORMAT_STRING)
-
-    FSFile.new(pointer, name, size, type, a_date, c_date, m_date, parent, entry_pointer)
   end
 
   def to_entry
@@ -72,7 +72,7 @@ class FSFile
     m_date = Time.at(self.m_date).strftime("%b %_d %R")
     a_date = Time.at(self.a_date).strftime("%b %_d %R")
     format = "%s %6.6s | %s | %s | %s"
-    format % [file_type, self.size.to_human, a_date, m_date, self.name]
+    format % [file_type, self.byte_size.to_human, a_date, m_date, self.name]
   end
 
   def read n_bytes, offset
@@ -158,8 +158,8 @@ class Directory < FSFile
     super(pointer, name, size, file_type, a_date, c_date, m_date, parent, entry_pointer)
   end
   
-  def size
-    self.entries_qnt * ENTRY_SIZE
+  def byte_size
+    (self.entries_qnt * ENTRY_SIZE) + ENTRY_SIZE
   end
 
   def self.reset_root
@@ -213,11 +213,7 @@ class Directory < FSFile
     (0...self.entries_qnt).each do |i|
       entry = self.read( ENTRY_SIZE, i * ENTRY_SIZE)
        if entry[0, NAME_SIZE].strip == name
-         if entry[TYPE_OFFSET, 1].unpack(FS::INT_8).first == 0
-           return Directory.init_dir(entry, self, i * ENTRY_SIZE)
-         else
-           return FSFile.init_file(entry, self, i * ENTRY_SIZE)
-         end
+         return Directory.init_dir(entry, self, i * ENTRY_SIZE)
        end
     end
     return nil
@@ -236,7 +232,11 @@ class Directory < FSFile
     name = entry.slice!(0, NAME_SIZE).strip
     pointer, size, type, a_date, c_date, m_date, entries_qnt = entry.unpack(ENTRY_FORMAT_STRING)
 
-    Directory.new(pointer, name, size, type, a_date, c_date, m_date, entries_qnt, parent, entry_pointer)
+    if(type == FSFile::MAGIC_NUMBER[:directory])
+      return Directory.new(pointer, name, size, type, a_date, c_date, m_date, entries_qnt, parent, entry_pointer)
+    else
+      return FSFile.new(pointer, name, size, type, a_date, c_date, m_date, parent, entry_pointer)
+    end
   end
 
   def mkdir name
