@@ -94,10 +94,12 @@ class FileSystem
   
   def rmfile file
     ptr = file.pointer
+    ptrs = [ptr]
     while (ptr != -1)
-      BitMap.set_free(ptr)
+      ptrs << ptr
       ptr = self.fat[ptr]
     end
+    BitMap.free_blocks(ptrs)
     file.parent.delete_entry file.name
   end
   
